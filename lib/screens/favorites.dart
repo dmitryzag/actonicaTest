@@ -134,6 +134,8 @@ class _FavoriteAdvertsState extends State<FavoriteAdverts> {
   }
 
   Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
+    var price =
+        '${item['price'] == Null ? 'бесплатно' : item['price'].toString() + ' руб.'}';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,7 +153,7 @@ class _FavoriteAdvertsState extends State<FavoriteAdverts> {
         ),
         const SizedBox(height: 8),
         Text(
-          '${item['price'] is Null ? 'бесплатно' : item['price'].toString() + ' руб.'}',
+          price,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 8),

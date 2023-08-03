@@ -4,7 +4,7 @@ import 'package:actonic_adboard/screens/favorites.dart';
 import 'package:actonic_adboard/screens/adverts.dart';
 
 void main() async {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -16,10 +16,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int currentIndex = 0;
-  final List<Widget> screens = [
+  final List<Widget> screens = const [
     Adverts(),
     FavoriteAdverts(),
-    const DataForm(null)
+    DataForm(null)
   ];
 
   @override

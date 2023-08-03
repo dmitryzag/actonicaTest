@@ -183,7 +183,7 @@ class _AdvertsState extends State<Adverts> {
   }
 
   Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
-    final dateTime = DateTime.parse(item['createdAt']) as DateTime;
+    final dateTime = DateTime.parse(item['createdAt']);
     final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
 
     return Column(
