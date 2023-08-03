@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:actonic_adboard/screens/advert_details.dart';
 import 'package:actonic_adboard/models/database.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Adverts extends StatefulWidget {
@@ -182,6 +183,9 @@ class _AdvertsState extends State<Adverts> {
   }
 
   Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
+    final dateTime = DateTime.parse(item['createdAt']) as DateTime;
+    final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +198,7 @@ class _AdvertsState extends State<Adverts> {
         ),
         const SizedBox(height: 8),
         Text(
-          "${item['author_name']} · ${item['createdAt']}",
+          "${item['author_name']} · $formattedDate",
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 8),

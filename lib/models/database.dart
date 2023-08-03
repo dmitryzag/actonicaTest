@@ -109,7 +109,6 @@ class SQLHelper {
 void main() async {
   await SQLHelper.createTables(await SQLHelper.db());
 
-  // Create sample adverts
   await SQLHelper.createData(
     'Advert 1',
     'Description for Advert 1',

@@ -1,5 +1,6 @@
 import 'package:actonic_adboard/models/database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
@@ -129,7 +130,7 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
                     ),
                     const SizedBox(height: 8.0),
                     Text(
-                      'Опубликовано: ${_adData.first["createdAt"]}',
+                      'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_adData.first["createdAt"]))}',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
