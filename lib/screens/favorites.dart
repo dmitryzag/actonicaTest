@@ -17,7 +17,7 @@ class _FavoriteAdvertsState extends State<FavoriteAdverts> {
   List<Map<String, dynamic>> _favoriteAdverts = [];
   bool _isLoading = true;
 
-  late SharedPreferences _preferences; // Changed from nullable
+  late SharedPreferences _preferences;
 
   @override
   void initState() {
@@ -147,14 +147,12 @@ class _FavoriteAdvertsState extends State<FavoriteAdverts> {
         const SizedBox(height: 8),
         Text(
           "${item['author_name']} · ${item['createdAt']}",
-          style:
-              Theme.of(context).textTheme.bodySmall, // Changed from bodyMedium
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 8),
         Text(
           '${item['price'] is Null ? 'бесплатно' : item['price'].toString() + ' руб.'}',
-          style:
-              Theme.of(context).textTheme.bodyMedium, // Changed from bodyLarge
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 8),
         buildFavoriteIcons(item['id']),

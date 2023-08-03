@@ -12,6 +12,8 @@ class Adverts extends StatefulWidget {
   State<Adverts> createState() => _AdvertsState();
 }
 
+bool isFunctionExecuted = false;
+
 class _AdvertsState extends State<Adverts> {
   List<int> favoriteData = [];
   List<Map<String, dynamic>> _allData = [];
@@ -21,6 +23,7 @@ class _AdvertsState extends State<Adverts> {
 
   @override
   void initState() {
+    _createDummyData();
     super.initState();
     _initPreferences();
     _refreshData();
@@ -29,6 +32,62 @@ class _AdvertsState extends State<Adverts> {
   Future<void> _initPreferences() async {
     _preferences = await SharedPreferences.getInstance();
     _loadFavoriteData();
+  }
+
+  void _createDummyData() {
+    if (!isFunctionExecuted) {
+      SQLHelper.createData(
+        'Продам собаку',
+        'Человек собаке друг',
+        SQLHelper.categoriesList[0].name,
+        'Дмитрий',
+        '123456789',
+        null,
+        100.0,
+      );
+
+      SQLHelper.createData(
+        'Продам чипсы',
+        'БУ, чуть-чуть поел чипсинки',
+        SQLHelper.categoriesList[1].name,
+        'Андрей',
+        '987654321',
+        null,
+        200.0,
+      );
+
+      SQLHelper.createData(
+        'Продам почку',
+        'Да зачем мне она, все равно их две',
+        SQLHelper.categoriesList[2].name,
+        'Алексей',
+        '555555555',
+        null,
+        300.0,
+      );
+
+      SQLHelper.createData(
+        'Продам гитару',
+        'Хорошая гитара, наверное, никогда не играл',
+        SQLHelper.categoriesList[0].name,
+        'Ольга',
+        '777777777',
+        null,
+        400.0,
+      );
+
+      SQLHelper.createData(
+        'Продам линейку',
+        'Хорошая линейка, 30см, пользовался для чертежей',
+        SQLHelper.categoriesList[1].name,
+        'Robert Wilson',
+        '999999999',
+        null,
+        500.0,
+      );
+
+      isFunctionExecuted = true;
+    }
   }
 
   void _loadFavoriteData() {
