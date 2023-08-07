@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:actonic_adboard/screens/advert_details.dart';
 import 'package:actonic_adboard/models/database.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoriteAdverts extends StatefulWidget {
@@ -134,6 +135,8 @@ class _FavoriteAdvertsState extends State<FavoriteAdverts> {
   }
 
   Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
+    final dateTime = DateTime.parse(item['createdAt']);
+    final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
     var price =
         '${item['price'] == Null ? 'бесплатно' : item['price'].toString() + ' руб.'}';
     return Column(
@@ -148,7 +151,7 @@ class _FavoriteAdvertsState extends State<FavoriteAdverts> {
         ),
         const SizedBox(height: 8),
         Text(
-          "${item['author_name']} · ${item['createdAt']}",
+          "${item['author_name']} · $formattedDate",
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 8),
