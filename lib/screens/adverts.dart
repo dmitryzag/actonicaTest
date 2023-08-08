@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:actonic_adboard/screens/advert_details.dart';
 import 'package:actonic_adboard/models/database.dart';
@@ -19,8 +18,9 @@ class _AdvertsState extends State<Adverts> {
   List<int> favoriteData = [];
   List<Map<String, dynamic>> _allData = [];
   bool _isLoading = true;
-
   SharedPreferences? _preferences;
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -116,7 +116,7 @@ class _AdvertsState extends State<Adverts> {
     _saveFavoriteData();
   }
 
-  void _refreshData() async {
+  Future<void> _refreshData() async {
     final data = await SQLHelper.getAllData();
     setState(() {
       _allData = data;
@@ -130,33 +130,37 @@ class _AdvertsState extends State<Adverts> {
       appBar: AppBar(
         title: Text('Доска объявлений'),
       ),
-      body: ListView.separated(
-        itemCount: _allData.length,
-        separatorBuilder: (context, index) => Divider(),
-        itemBuilder: (BuildContext context, int index) {
-          final item = _allData[index];
-          final adId = item['id'];
-          final isFavorite = favoriteData.contains(adId);
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refreshData,
+        child: ListView.separated(
+          itemCount: _allData.length,
+          separatorBuilder: (context, index) => Divider(),
+          itemBuilder: (BuildContext context, int index) {
+            final item = _allData[index];
+            final adId = item['id'];
+            final isFavorite = favoriteData.contains(adId);
 
-          return GestureDetector(
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AdDetailsScreen(
-                    favoriteData: favoriteData,
-                    isFavorite: isFavorite,
-                    adId: adId,
-                    onToggleFavorite: (isFavorite) {
-                      _toggleFavorite(adId, isFavorite);
-                    },
+            return GestureDetector(
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AdDetailsScreen(
+                      favoriteData: favoriteData,
+                      isFavorite: isFavorite,
+                      adId: adId,
+                      onToggleFavorite: (isFavorite) {
+                        _toggleFavorite(adId, isFavorite);
+                      },
+                    ),
                   ),
-                ),
-              );
-            },
-            child: buildAdvertContainer(context, item, isFavorite),
-          );
-        },
+                );
+              },
+              child: buildAdvertContainer(context, item, isFavorite),
+            );
+          },
+        ),
       ),
     );
   }
