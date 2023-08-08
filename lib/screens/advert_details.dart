@@ -53,14 +53,14 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
     });
   }
 
-  void _refreshAdData() async {
+  Future<void> _refreshAdData() async {
     setState(() {
       _isLoading = true;
     });
 
-    setState(() {
-      _isLoading = false;
-    });
+    // Здесь можно добавить логику для обновления данных объявления
+
+    _loadAdData();
   }
 
   void _toggleFavorite() {
@@ -113,96 +113,99 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _adData.first['title'],
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+      body: RefreshIndicator(
+        onRefresh: _refreshAdData,
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _adData.first['title'],
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_adData.first["createdAt"]))}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
+                      const SizedBox(height: 8.0),
+                      Text(
+                        'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_adData.first["createdAt"]))}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    if (_adData.first['image'] != null &&
-                        _adData.first['image'] != '')
-                      Image.file(File(_adData.first['image'])),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Описание:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 16.0),
+                      if (_adData.first['image'] != null &&
+                          _adData.first['image'] != '')
+                        Image.file(File(_adData.first['image'])),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Описание:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(_adData.first['description']),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Категория:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8.0),
+                      Text(_adData.first['description']),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Категория:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(_adData.first['category']),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Автор:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8.0),
+                      Text(_adData.first['category']),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Автор:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text('Имя: ${_adData.first['author_name']}'),
-                    const SizedBox(height: 8.0),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Цена:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8.0),
+                      Text('Имя: ${_adData.first['author_name']}'),
+                      const SizedBox(height: 8.0),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Цена:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                        '${_adData.first['price'] is Null ? 'бесплатно' : _adData.first['price'].toString() + ' руб.'}'),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Позвонить по телефону:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8.0),
+                      Text(
+                          '${_adData.first['price'] is Null ? 'бесплатно' : _adData.first['price'].toString() + ' руб.'}'),
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Позвонить по телефону:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomLeft,
-                      child: IconButton(
-                        icon: Icon(Icons.phone),
-                        onPressed: () {
-                          _makingPhoneCall(_adData.first['author_phone']);
-                        },
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: IconButton(
+                          icon: Icon(Icons.phone),
+                          onPressed: () {
+                            _makingPhoneCall(_adData.first['author_phone']);
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
+      ),
     );
   }
 }

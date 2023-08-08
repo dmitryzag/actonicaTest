@@ -88,7 +88,7 @@ class _DataFormState extends State<DataForm> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Название'),
+                decoration: const InputDecoration(labelText: 'Название'),
                 validator: (value) {
                   if (value == '') {
                     return 'Введите название';
@@ -98,7 +98,7 @@ class _DataFormState extends State<DataForm> {
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Описание'),
+                decoration: const InputDecoration(labelText: 'Описание'),
               ),
               DropdownButtonFormField<Category>(
                 value: _selectedCategory,
@@ -113,7 +113,7 @@ class _DataFormState extends State<DataForm> {
                     child: Text(category.name),
                   );
                 }).toList(),
-                decoration: InputDecoration(labelText: 'Категория'),
+                decoration: const InputDecoration(labelText: 'Категория'),
                 validator: (value) {
                   if (value == null) {
                     return 'Выберите категорию';
@@ -123,7 +123,7 @@ class _DataFormState extends State<DataForm> {
               ),
               TextFormField(
                 controller: _authorNameController,
-                decoration: InputDecoration(labelText: 'Имя автора'),
+                decoration: const InputDecoration(labelText: 'Имя автора'),
                 validator: (value) {
                   if (value == '') {
                     return 'Введите имя автора';
@@ -133,7 +133,7 @@ class _DataFormState extends State<DataForm> {
               ),
               TextFormField(
                 controller: _authorPhoneController,
-                decoration: InputDecoration(labelText: 'Телефон автора'),
+                decoration: const InputDecoration(labelText: 'Телефон автора'),
                 validator: (value) {
                   if (value == '') {
                     return 'Пожалуйста введите номер телефона автора';
@@ -143,10 +143,11 @@ class _DataFormState extends State<DataForm> {
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: InputDecoration(labelText: 'Цена'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Цена'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _pickImage,
                 child: Text('Добавить Изображение'),

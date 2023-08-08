@@ -57,7 +57,6 @@ class SQLHelper {
     };
     final id = await db.insert('data', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
-    print(data);
     return id;
   }
 
