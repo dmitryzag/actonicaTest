@@ -4,6 +4,7 @@ import 'package:actonic_adboard/screens/advert_details.dart';
 import 'package:actonic_adboard/models/database.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:actonic_adboard/models/dummy_data.dart';
 
 class Adverts extends StatefulWidget {
   const Adverts({Key? key}) : super(key: key);
@@ -37,56 +38,7 @@ class _AdvertsState extends State<Adverts> {
 
   void _createDummyData() {
     if (!isFunctionExecuted) {
-      SQLHelper.createData(
-        'Продам собаку',
-        'Человек собаке друг',
-        SQLHelper.categoriesList[0].name,
-        'Дмитрий',
-        '123456789',
-        null,
-        100.0,
-      );
-
-      SQLHelper.createData(
-        'Продам чипсы',
-        'БУ, чуть-чуть поел чипсинки',
-        SQLHelper.categoriesList[1].name,
-        'Андрей',
-        '987654321',
-        null,
-        200.0,
-      );
-
-      SQLHelper.createData(
-        'Продам почку',
-        'Да зачем мне она, все равно их две',
-        SQLHelper.categoriesList[2].name,
-        'Алексей',
-        '555555555',
-        null,
-        300.0,
-      );
-
-      SQLHelper.createData(
-        'Продам гитару',
-        'Хорошая гитара, наверное, никогда не играл',
-        SQLHelper.categoriesList[0].name,
-        'Ольга',
-        '777777777',
-        null,
-        400.0,
-      );
-
-      SQLHelper.createData(
-        'Продам линейку',
-        'Хорошая линейка, 30см, пользовался для чертежей',
-        SQLHelper.categoriesList[1].name,
-        'Robert Wilson',
-        '999999999',
-        null,
-        500.0,
-      );
-
+      createDummyData();
       isFunctionExecuted = true;
     }
   }
