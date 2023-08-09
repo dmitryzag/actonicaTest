@@ -58,8 +58,6 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
       _isLoading = true;
     });
 
-    // Здесь можно добавить логику для обновления данных объявления
-
     _loadAdData();
   }
 
