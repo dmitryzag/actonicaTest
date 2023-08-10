@@ -190,7 +190,7 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       Align(
                         alignment: Alignment.bottomLeft,
                         child: GestureDetector(
@@ -198,15 +198,15 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
                               "+7${_adData.first['author_phone']}"),
                           child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.phone,
                                 color: Color.fromARGB(255, 19, 102, 170),
                               ),
-                              Padding(
+                              const Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 5)),
                               Text(
                                 "+7${_adData.first['author_phone']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
                                     color: Colors.blue),
