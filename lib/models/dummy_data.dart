@@ -8,7 +8,7 @@ void createDummyData() {
     'Дмитрий',
     '123456789',
     null,
-    100.0,
+    100,
   );
 
   SQLHelper.createData(
@@ -18,7 +18,7 @@ void createDummyData() {
     'Андрей',
     '987654321',
     null,
-    200.0,
+    200,
   );
 
   SQLHelper.createData(
@@ -28,7 +28,7 @@ void createDummyData() {
     'Алексей',
     '555555555',
     null,
-    300.0,
+    300,
   );
 
   SQLHelper.createData(
@@ -38,16 +38,16 @@ void createDummyData() {
     'Ольга',
     '777777777',
     null,
-    400.0,
+    400,
   );
 
   SQLHelper.createData(
     'Продам линейку',
     'Хорошая линейка, 30см, пользовался для чертежей',
     SQLHelper.categoriesList[1].name,
-    'Robert Wilson',
+    'Оппенгеймер',
     '999999999',
     null,
-    500.0,
+    500,
   );
 }

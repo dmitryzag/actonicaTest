@@ -47,7 +47,7 @@ class _DataFormState extends State<DataForm> {
       _authorNameController.text,
       _authorPhoneController.text,
       _imageController.text,
-      double.tryParse(_priceController.text),
+      int.tryParse(_priceController.text),
     );
     _refreshData();
   }
@@ -55,14 +55,14 @@ class _DataFormState extends State<DataForm> {
   void _fillFieldsWithAd() async {
     final ad = await SQLHelper.getSingleData(widget.adID!);
     setState(() {
-      _titleController.text = ad[0]['title'];
-      _descriptionController.text = ad[0]['description'];
+      _titleController.text = ad.first['title'];
+      _descriptionController.text = ad.first['description'];
       _selectedCategory = SQLHelper.categoriesList
-          .firstWhere((category) => category.name == ad[0]['category']);
-      _authorNameController.text = ad[0]['author_name'];
-      _authorPhoneController.text = ad[0]['author_phone'];
-      _imageController.text = ad[0]['image'];
-      _priceController.text = ad[0]['price'].toString();
+          .firstWhere((category) => category.name == ad.first['category']);
+      _authorNameController.text = ad.first['author_name'];
+      _authorPhoneController.text = ad.first['author_phone'];
+      _imageController.text = ad.first['image'];
+      _priceController.text = ad.first['price'].toString();
     });
   }
 
@@ -143,9 +143,17 @@ class _DataFormState extends State<DataForm> {
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: const InputDecoration(labelText: 'Цена'),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Цена ₽',
+                  prefixText: '\u{20BD} ',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (int.tryParse(value!) is! int) {
+                    return 'Пожалуйста введите актуальную цену';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
@@ -161,7 +169,7 @@ class _DataFormState extends State<DataForm> {
                     final authorName = _authorNameController.text;
                     final authorPhone = _authorPhoneController.text;
                     final image = _imageController.text;
-                    final price = double.tryParse(_priceController.text);
+                    final price = int.tryParse(_priceController.text);
 
                     if (widget.adID != null) {
                       SQLHelper.updateData(
@@ -197,8 +205,10 @@ class _DataFormState extends State<DataForm> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text(
-                              'Объявление ${widget.adID != null ? 'обновлено' : 'создано'}')),
+                        content: Text(
+                          'Объявление ${widget.adID != null ? 'обновлено' : 'создано'}',
+                        ),
+                      ),
                     );
                   }
                 },

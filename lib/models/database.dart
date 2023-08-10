@@ -42,7 +42,7 @@ class SQLHelper {
       String author_name,
       String author_phone,
       String? image,
-      double? price) async {
+      int? price) async {
     final db = await SQLHelper.db();
 
     final data = {
@@ -79,7 +79,7 @@ class SQLHelper {
     String author_name,
     String author_phone,
     String? image,
-    double? price,
+    int? price,
   ) async {
     final db = await SQLHelper.db();
     final data = {
