@@ -15,7 +15,7 @@ class SQLHelper {
         description TEXT,
         category TEXT NOT NULL,
         author_name TEXT NOT NULL,
-        author_phone TEXT NOT NULL,
+        author_phone REAL NOT NULL,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         image TEXT,
         price REAL
@@ -40,9 +40,9 @@ class SQLHelper {
       String? desc,
       String category,
       String author_name,
-      String author_phone,
+      int author_phone,
       String? image,
-      int? price) async {
+      double? price) async {
     final db = await SQLHelper.db();
 
     final data = {
@@ -77,9 +77,9 @@ class SQLHelper {
     String? desc,
     String category,
     String author_name,
-    String author_phone,
+    int author_phone,
     String? image,
-    int? price,
+    double? price,
   ) async {
     final db = await SQLHelper.db();
     final data = {

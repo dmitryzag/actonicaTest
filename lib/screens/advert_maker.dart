@@ -45,9 +45,9 @@ class _DataFormState extends State<DataForm> {
       _descriptionController.text,
       _selectedCategory!.name,
       _authorNameController.text,
-      _authorPhoneController.text,
+      int.tryParse(_authorPhoneController.text)!,
       _imageController.text,
-      int.tryParse(_priceController.text),
+      double.tryParse(_priceController.text),
     );
     _refreshData();
   }
@@ -133,9 +133,13 @@ class _DataFormState extends State<DataForm> {
               ),
               TextFormField(
                 controller: _authorPhoneController,
-                decoration: const InputDecoration(labelText: 'Телефон автора'),
+                decoration: const InputDecoration(
+                  labelText: 'Телефон автора',
+                  prefixText: '+7',
+                ),
+                keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == '') {
+                  if (int.tryParse(value!) is! int) {
                     return 'Пожалуйста введите номер телефона автора';
                   }
                   return null;
@@ -147,10 +151,10 @@ class _DataFormState extends State<DataForm> {
                   labelText: 'Цена ₽',
                   prefixText: '\u{20BD} ',
                 ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (int.tryParse(value!) is! int) {
-                    return 'Пожалуйста введите актуальную цену';
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: (String? value) {
+                  if (value == null || double.tryParse(value) == null) {
+                    return 'Пожалуйста, введите актуальную цену';
                   }
                   return null;
                 },
@@ -167,9 +171,10 @@ class _DataFormState extends State<DataForm> {
                     final description = _descriptionController.text;
                     final category = _selectedCategory!.name;
                     final authorName = _authorNameController.text;
-                    final authorPhone = _authorPhoneController.text;
+                    final authorPhone =
+                        int.tryParse(_authorPhoneController.text)!;
                     final image = _imageController.text;
-                    final price = int.tryParse(_priceController.text);
+                    final price = double.parse(_priceController.text);
 
                     if (widget.adID != null) {
                       SQLHelper.updateData(

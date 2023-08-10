@@ -6,7 +6,7 @@ void createDummyData() {
     'Человек собаке друг',
     SQLHelper.categoriesList[0].name,
     'Дмитрий',
-    '123456789',
+    123456789,
     null,
     100,
   );
@@ -16,7 +16,7 @@ void createDummyData() {
     'БУ, чуть-чуть поел чипсинки',
     SQLHelper.categoriesList[1].name,
     'Андрей',
-    '987654321',
+    987654321,
     null,
     200,
   );
@@ -26,7 +26,7 @@ void createDummyData() {
     'Да зачем мне она, все равно их две',
     SQLHelper.categoriesList[2].name,
     'Алексей',
-    '555555555',
+    555555555,
     null,
     300,
   );
@@ -36,7 +36,7 @@ void createDummyData() {
     'Хорошая гитара, наверное, никогда не играл',
     SQLHelper.categoriesList[0].name,
     'Ольга',
-    '777777777',
+    777777777,
     null,
     400,
   );
@@ -46,7 +46,7 @@ void createDummyData() {
     'Хорошая линейка, 30см, пользовался для чертежей',
     SQLHelper.categoriesList[1].name,
     'Оппенгеймер',
-    '999999999',
+    999999999,
     null,
     500,
   );

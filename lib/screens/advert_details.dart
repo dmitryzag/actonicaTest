@@ -190,13 +190,29 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      SizedBox(height: 15),
                       Align(
                         alignment: Alignment.bottomLeft,
-                        child: IconButton(
-                          icon: Icon(Icons.phone),
-                          onPressed: () {
-                            _makingPhoneCall(_adData.first['author_phone']);
-                          },
+                        child: GestureDetector(
+                          onTap: () => _makingPhoneCall(
+                              "+7${_adData.first['author_phone']}"),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.phone,
+                                color: Color.fromARGB(255, 19, 102, 170),
+                              ),
+                              Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 5)),
+                              Text(
+                                "+7${_adData.first['author_phone']}",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.blue),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     ],
