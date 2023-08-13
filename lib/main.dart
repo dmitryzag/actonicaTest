@@ -16,10 +16,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int currentIndex = 0;
-  final List<Widget> screens = const [
+  final List<Widget> screens = [
     Adverts(),
-    FavoriteAdverts(),
-    DataForm(null)
+    const FavoriteAdverts(),
+    const DataForm(null)
   ];
 
   @override
