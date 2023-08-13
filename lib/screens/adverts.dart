@@ -1,13 +1,80 @@
 import 'dart:io';
-
-import 'package:intl/intl.dart';
-import 'package:actonic_adboard/screens/advert_details.dart';
 import 'package:flutter/material.dart';
+import 'package:actonic_adboard/screens/advert_details.dart';
+import 'package:actonic_adboard/models/database.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:actonic_adboard/models/dummy_data.dart';
 
-import '../bloc/advert_bloc.dart';
+class Adverts extends StatefulWidget {
+  const Adverts({Key? key}) : super(key: key);
 
-class Adverts extends StatelessWidget {
-  final AdvertsBloc bloc = AdvertsBloc();
+  @override
+  State<Adverts> createState() => _AdvertsState();
+}
+
+bool isFunctionExecuted = false;
+
+class _AdvertsState extends State<Adverts> {
+  List<int> favoriteData = [];
+  List<Map<String, dynamic>> _allData = [];
+  bool _isLoading = true;
+  SharedPreferences? _preferences;
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  @override
+  void initState() {
+    _createDummyData();
+    super.initState();
+    _initPreferences();
+    _refreshData();
+  }
+
+  Future<void> _initPreferences() async {
+    _preferences = await SharedPreferences.getInstance();
+    _loadFavoriteData();
+  }
+
+  void _createDummyData() {
+    if (!isFunctionExecuted) {
+      createDummyData();
+      isFunctionExecuted = true;
+    }
+  }
+
+  void _loadFavoriteData() {
+    final favoriteDataString = _preferences!.getString('favoriteData');
+    if (favoriteDataString != null) {
+      setState(() {
+        favoriteData = favoriteDataString.split(',').map(int.parse).toList();
+      });
+    }
+  }
+
+  Future<void> _saveFavoriteData() async {
+    final favoriteDataString = favoriteData.join(',');
+    await _preferences!.setString('favoriteData', favoriteDataString);
+  }
+
+  void _toggleFavorite(int adId, bool isFavorite) {
+    setState(() {
+      if (isFavorite) {
+        favoriteData.add(adId);
+      } else {
+        favoriteData.remove(adId);
+      }
+    });
+    _saveFavoriteData();
+  }
+
+  Future<void> _refreshData() async {
+    final data = await SQLHelper.getAllData();
+    setState(() {
+      _allData = data;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,54 +82,43 @@ class Adverts extends StatelessWidget {
       appBar: AppBar(
         title: Text('Доска объявлений'),
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>?>(
-        stream: bloc.adData,
-        builder: (context, snapshot) {
-          final List<Map<String, dynamic>> _allData = snapshot.data ?? [];
-          final List<int> favoriteData = bloc.favoriteData as List<int>;
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refreshData,
+        child: ListView.separated(
+          itemCount: _allData.length,
+          separatorBuilder: (context, index) => Divider(),
+          itemBuilder: (BuildContext context, int index) {
+            final item = _allData[index];
+            final adId = item['id'];
+            final isFavorite = favoriteData.contains(adId);
 
-          return RefreshIndicator(
-            key: bloc.refreshIndicatorKey,
-            onRefresh: bloc.refreshData,
-            child: ListView.separated(
-              itemCount: _allData.length,
-              separatorBuilder: (context, index) => Divider(),
-              itemBuilder: (BuildContext context, int index) {
-                final item = _allData[index];
-                final adId = item['id'];
-                final isFavorite = favoriteData.contains(adId);
-
-                return GestureDetector(
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdDetailsScreen(
-                          favoriteData: favoriteData,
-                          isFavorite: isFavorite,
-                          adId: adId,
-                          onToggleFavorite: (isFavorite) {
-                            bloc.toggleFavorite(favoriteData, adId, isFavorite);
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                  child: buildAdvertContainer(context, item, isFavorite),
+            return GestureDetector(
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AdDetailsScreen(
+                      favoriteData: favoriteData,
+                      isFavorite: isFavorite,
+                      adId: adId,
+                      onToggleFavorite: (isFavorite) {
+                        _toggleFavorite(adId, isFavorite);
+                      },
+                    ),
+                  ),
                 );
               },
-            ),
-          );
-        },
+              child: buildAdvertContainer(context, item, isFavorite),
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget buildAdvertContainer(
       BuildContext context, Map<String, dynamic> item, bool isFavorite) {
-    final dateTime = DateTime.parse(item['createdAt']);
-    final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-
     return Container(
       height: 136,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
@@ -107,17 +163,12 @@ class Adverts extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 8),
-        StreamBuilder<List<int>>(
-            stream: bloc.favoriteData,
-            builder: (context, snapshot) {
-              final List<int> favoriteData = snapshot.data ?? [];
-              return buildFavoriteIcons(item['id'], favoriteData);
-            }),
+        buildFavoriteIcons(item['id']),
       ],
     );
   }
 
-  Widget buildFavoriteIcons(int adId, List<int> favoriteData) {
+  Widget buildFavoriteIcons(int adId) {
     final isFavorite = favoriteData.contains(adId);
 
     return Row(
@@ -125,7 +176,14 @@ class Adverts extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            bloc.toggleFavorite(favoriteData, adId, !isFavorite);
+            setState(() {
+              if (isFavorite) {
+                favoriteData.remove(adId);
+              } else {
+                favoriteData.add(adId);
+              }
+            });
+            _saveFavoriteData();
           },
           child: Padding(
             padding: const EdgeInsets.only(right: 8.0),
