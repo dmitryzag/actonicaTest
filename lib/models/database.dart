@@ -1,4 +1,9 @@
+import 'dart:io';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+
+import 'dummy_data.dart';
 
 class Category {
   final int id;
@@ -8,6 +13,13 @@ class Category {
 }
 
 class SQLHelper {
+  static Future<String> get _databasePath async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    return path.join(directory.path, "database_name.db");
+  }
+
+  static get io => null;
+
   static Future<void> createTables(sql.Database database) async {
     await database.execute("""CREATE TABLE data(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -15,7 +27,7 @@ class SQLHelper {
         description TEXT,
         category TEXT NOT NULL,
         author_name TEXT NOT NULL,
-        author_phone REAL NOT NULL,
+        author_phone INTEGER NOT NULL,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         image TEXT,
         price REAL
@@ -23,10 +35,19 @@ class SQLHelper {
   }
 
   static Future<sql.Database> db() async {
-    return sql.openDatabase("database_name.db", version: 1,
-        onCreate: (sql.Database database, int version) async {
-      await createTables(database);
-    });
+    final String path = await _databasePath;
+    final bool databaseExists = File(await _databasePath).existsSync();
+
+    if (!databaseExists) {
+      final sql.Database database = await sql.openDatabase(path, version: 1,
+          onCreate: (sql.Database database, int version) async {
+        await createTables(database);
+        await createDummyData();
+      });
+      return database;
+    } else {
+      return sql.openDatabase(path);
+    }
   }
 
   static List<Category> categoriesList = [

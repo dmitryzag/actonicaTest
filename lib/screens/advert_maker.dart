@@ -152,12 +152,6 @@ class _DataFormState extends State<DataForm> {
                   prefixText: '\u{20BD} ',
                 ),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (String? value) {
-                  if (value == null || double.tryParse(value) == null) {
-                    return 'Пожалуйста, введите актуальную цену';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
@@ -174,7 +168,9 @@ class _DataFormState extends State<DataForm> {
                     final authorPhone =
                         int.tryParse(_authorPhoneController.text)!;
                     final image = _imageController.text;
-                    final price = double.parse(_priceController.text);
+                    final price = _priceController.text.isEmpty
+                        ? null
+                        : double.parse(_priceController.text);
 
                     if (widget.adID != null) {
                       SQLHelper.updateData(

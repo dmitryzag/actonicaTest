@@ -13,8 +13,6 @@ class Adverts extends StatefulWidget {
   State<Adverts> createState() => _AdvertsState();
 }
 
-bool isFunctionExecuted = false;
-
 class _AdvertsState extends State<Adverts> {
   List<int> favoriteData = [];
   List<Map<String, dynamic>> _allData = [];
@@ -25,22 +23,14 @@ class _AdvertsState extends State<Adverts> {
 
   @override
   void initState() {
-    _createDummyData();
-    super.initState();
-    _initPreferences();
     _refreshData();
+    _initPreferences();
+    super.initState();
   }
 
   Future<void> _initPreferences() async {
     _preferences = await SharedPreferences.getInstance();
     _loadFavoriteData();
-  }
-
-  void _createDummyData() {
-    if (!isFunctionExecuted) {
-      createDummyData();
-      isFunctionExecuted = true;
-    }
   }
 
   void _loadFavoriteData() {
