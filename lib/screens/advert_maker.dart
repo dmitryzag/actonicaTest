@@ -2,14 +2,14 @@ import 'package:actonic_adboard/models/database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class DataForm extends StatefulWidget {
+class AdvertMaker extends StatefulWidget {
   final int? adID;
-  const DataForm(this.adID, {Key? key}) : super(key: key);
+  const AdvertMaker(this.adID, {Key? key}) : super(key: key);
   @override
-  _DataFormState createState() => _DataFormState();
+  _AdvertMakerState createState() => _AdvertMakerState();
 }
 
-class _DataFormState extends State<DataForm> {
+class _AdvertMakerState extends State<AdvertMaker> {
   // ignore: unused_field
   List<Map<String, dynamic>> _allData = [];
   Category? _selectedCategory;

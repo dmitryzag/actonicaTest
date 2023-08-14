@@ -92,7 +92,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DataForm(_adData.first['id'])),
+                    builder: (context) => AdvertMaker(_adData.first['id'])),
               );
 
               if (result == true) {
