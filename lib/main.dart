@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   final List<Widget> screens = const [
     AdvertScreen(),
     AdvertScreen(isFavorite: true),
-    DataForm(null)
+    AdvertMaker(null)
   ];
 
   @override
