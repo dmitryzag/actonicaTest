@@ -224,7 +224,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
         borderRadius: BorderRadius.circular(8.0),
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: Image.asset("assets/images/no_photo.jpg").image,
+          image: FileImage(File(imageUrl)),
         ),
       ),
     );

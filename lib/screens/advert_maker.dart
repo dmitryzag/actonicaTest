@@ -39,7 +39,7 @@ class _DataFormState extends State<DataForm> {
       });
     } else {
       setState(() {
-        _imageController.text = 'assets/images/no_photo.jpg';
+        _imageController.text = 'assets/images/nophoto.jpg';
       });
     }
   }
@@ -78,139 +78,141 @@ class _DataFormState extends State<DataForm> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Название'),
-                validator: (value) {
-                  if (value == '') {
-                    return 'Введите название';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Описание'),
-              ),
-              DropdownButtonFormField<Category>(
-                value: _selectedCategory,
-                onChanged: (Category? newValue) {
-                  setState(() {
-                    _selectedCategory = newValue;
-                  });
-                },
-                items: SQLHelper.categoriesList.map((Category category) {
-                  return DropdownMenuItem<Category>(
-                    value: category,
-                    child: Text(category.name),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(labelText: 'Категория'),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Выберите категорию';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _authorNameController,
-                decoration: const InputDecoration(labelText: 'Имя автора'),
-                validator: (value) {
-                  if (value == '') {
-                    return 'Введите имя автора';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _authorPhoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Телефон автора',
-                  prefixText: '+7',
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(labelText: 'Название'),
+                  validator: (value) {
+                    if (value == '') {
+                      return 'Введите название';
+                    }
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (int.tryParse(value!) is! int) {
-                    return 'Пожалуйста введите номер телефона автора';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Цена ₽',
-                  prefixText: '\u{20BD} ',
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(labelText: 'Описание'),
                 ),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _pickImage,
-                child: const Text('Добавить Изображение'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    final title = _titleController.text;
-                    final description = _descriptionController.text;
-                    final category = _selectedCategory!.name;
-                    final authorName = _authorNameController.text;
-                    final authorPhone =
-                        int.tryParse(_authorPhoneController.text)!;
-                    final image = _imageController.text;
-                    final price = _priceController.text.isEmpty
-                        ? null
-                        : double.parse(_priceController.text);
+                DropdownButtonFormField<Category>(
+                  value: _selectedCategory,
+                  onChanged: (Category? newValue) {
+                    setState(() {
+                      _selectedCategory = newValue;
+                    });
+                  },
+                  items: SQLHelper.categoriesList.map((Category category) {
+                    return DropdownMenuItem<Category>(
+                      value: category,
+                      child: Text(category.name),
+                    );
+                  }).toList(),
+                  decoration: const InputDecoration(labelText: 'Категория'),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Выберите категорию';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _authorNameController,
+                  decoration: const InputDecoration(labelText: 'Имя автора'),
+                  validator: (value) {
+                    if (value == '') {
+                      return 'Введите имя автора';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _authorPhoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Телефон автора',
+                    prefixText: '+7',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (int.tryParse(value!) is! int) {
+                      return 'Пожалуйста введите номер телефона автора';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: _priceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Цена ₽',
+                    prefixText: '\u{20BD} ',
+                  ),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _pickImage,
+                  child: const Text('Добавить Изображение'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      final title = _titleController.text;
+                      final description = _descriptionController.text;
+                      final category = _selectedCategory!.name;
+                      final authorName = _authorNameController.text;
+                      final authorPhone =
+                          int.tryParse(_authorPhoneController.text)!;
+                      final image = _imageController.text;
+                      final price = _priceController.text.isEmpty
+                          ? null
+                          : double.parse(_priceController.text);
 
-                    if (widget.adID != null) {
-                      SQLHelper.updateData(
-                        widget.adID!,
-                        title,
-                        description,
-                        category,
-                        authorName,
-                        authorPhone,
-                        image,
-                        price,
-                      );
-                      Navigator.pop(context, true);
-                    } else {
-                      SQLHelper.createData(
-                        title,
-                        description,
-                        category,
-                        authorName,
-                        authorPhone,
-                        image,
-                        price,
+                      if (widget.adID != null) {
+                        SQLHelper.updateData(
+                          widget.adID!,
+                          title,
+                          description,
+                          category,
+                          authorName,
+                          authorPhone,
+                          image,
+                          price,
+                        );
+                        Navigator.pop(context, true);
+                      } else {
+                        SQLHelper.createData(
+                          title,
+                          description,
+                          category,
+                          authorName,
+                          authorPhone,
+                          image,
+                          price,
+                        );
+                      }
+
+                      _titleController.clear();
+                      _descriptionController.clear();
+                      _selectedCategory = null;
+                      _authorNameController.clear();
+                      _authorPhoneController.clear();
+                      _imageController.clear();
+                      _priceController.clear();
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Объявление ${widget.adID != null ? 'обновлено' : 'создано'}',
+                          ),
+                        ),
                       );
                     }
-
-                    _titleController.clear();
-                    _descriptionController.clear();
-                    _selectedCategory = null;
-                    _authorNameController.clear();
-                    _authorPhoneController.clear();
-                    _imageController.clear();
-                    _priceController.clear();
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Объявление ${widget.adID != null ? 'обновлено' : 'создано'}',
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: Text(widget.adID != null ? 'Обновить' : 'Создать'),
-              ),
-            ],
+                  },
+                  child: Text(widget.adID != null ? 'Обновить' : 'Создать'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
