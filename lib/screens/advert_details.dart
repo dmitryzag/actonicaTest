@@ -71,6 +71,14 @@ class _AdvertDetailsState extends State<AdvertDetails> {
     widget.onToggleFavorite(_isFavorite);
   }
 
+  Image imageControl() {
+    if (_adData.first['image'] != null && _adData.first['image'] != '') {
+      return Image.file(File(_adData.first['image']));
+    } else {
+      return Image.asset('assets/images/nophoto.jpg');
+    }
+  }
+
   void _deleteAd() async {
     await SQLHelper.deleteData(widget.adId);
     Navigator.pop(context, true);
@@ -138,9 +146,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 16.0),
-                      if (_adData.first['image'] != null &&
-                          _adData.first['image'] != '')
-                        Image.file(File(_adData.first['image'])),
+                      imageControl(),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Описание:',

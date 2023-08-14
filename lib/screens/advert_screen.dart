@@ -147,7 +147,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
   Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
     final dateTime = DateTime.parse(item['createdAt']);
     final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-    var price = item['price'] == Null ? 'бесплатно' : '${item['price']} руб.';
+    var price = item['price'] == null ? 'бесплатно' : '${item['price']} руб.';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,7 +224,9 @@ class _AdvertScreenState extends State<AdvertScreen> {
         borderRadius: BorderRadius.circular(8.0),
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: FileImage(File(imageUrl)),
+          image: imageUrl == ''
+              ? Image.asset('assets/images/nophoto.jpg').image
+              : FileImage(File(imageUrl)),
         ),
       ),
     );

@@ -7,7 +7,7 @@ createDummyData() {
     SQLHelper.categoriesList[0].name,
     'Дмитрий',
     9059110772,
-    'assets/images/nophoto.jpg',
+    '',
     100,
   );
 
@@ -17,7 +17,7 @@ createDummyData() {
     SQLHelper.categoriesList[1].name,
     'Андрей',
     9059110772,
-    'assets/images/nophoto.jpg',
+    '',
     200,
   );
 
@@ -27,7 +27,7 @@ createDummyData() {
     SQLHelper.categoriesList[2].name,
     'Алексей',
     9059110772,
-    'assets/images/nophoto.jpg',
+    '',
     300,
   );
 
@@ -37,7 +37,7 @@ createDummyData() {
     SQLHelper.categoriesList[0].name,
     'Ольга',
     9059110772,
-    'assets/images/nophoto.jpg',
+    '',
     400,
   );
 
@@ -47,7 +47,7 @@ createDummyData() {
     SQLHelper.categoriesList[1].name,
     'Оппенгеймер',
     9059110772,
-    'assets/images/nophoto.jpg',
+    '',
     500,
   );
 }

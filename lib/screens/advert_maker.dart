@@ -39,7 +39,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
       });
     } else {
       setState(() {
-        _imageController.text = 'assets/images/nophoto.jpg';
+        _imageController.text = '';
       });
     }
   }
@@ -62,7 +62,6 @@ class _AdvertMakerState extends State<AdvertMaker> {
   @override
   void initState() {
     super.initState();
-    _imageController.text = '';
     if (widget.adID != null) {
       _fillFieldsWithAd();
     }
