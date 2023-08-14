@@ -7,13 +7,14 @@ import 'dart:io';
 import '../main.dart';
 import 'advert_maker.dart';
 
-class AdDetailsScreen extends StatefulWidget {
+class AdvertDetails extends StatefulWidget {
   final int adId;
   final bool isFavorite;
-  List<int> favoriteData;
+  final List<int> favoriteData;
   final Function(bool isFavorite) onToggleFavorite;
 
-  AdDetailsScreen({
+  const AdvertDetails({
+    super.key,
     required this.favoriteData,
     required this.isFavorite,
     required this.adId,
@@ -21,10 +22,11 @@ class AdDetailsScreen extends StatefulWidget {
   });
 
   @override
-  _AdDetailsScreenState createState() => _AdDetailsScreenState();
+  // ignore: library_private_types_in_public_api
+  _AdvertDetailsState createState() => _AdvertDetailsState();
 }
 
-class _AdDetailsScreenState extends State<AdDetailsScreen> {
+class _AdvertDetailsState extends State<AdvertDetails> {
   late List<Map<String, dynamic>> _adData;
   bool _isLoading = true;
   bool _isFavorite = false;
@@ -72,7 +74,6 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
   void _deleteAd() async {
     await SQLHelper.deleteData(widget.adId);
     Navigator.pop(context, true);
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => MyApp()),
@@ -180,8 +181,9 @@ class _AdDetailsScreenState extends State<AdDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(
-                          '${_adData.first['price'] is Null ? 'бесплатно' : _adData.first['price'].toString() + ' руб.'}'),
+                      Text(_adData.first['price'] == null
+                          ? 'бесплатно'
+                          : '${_adData.first['price']} руб.'),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Позвонить по телефону:',

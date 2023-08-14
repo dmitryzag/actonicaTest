@@ -10,16 +10,17 @@ class DataForm extends StatefulWidget {
 }
 
 class _DataFormState extends State<DataForm> {
+  // ignore: unused_field
   List<Map<String, dynamic>> _allData = [];
   Category? _selectedCategory;
 
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _authorNameController = TextEditingController();
-  TextEditingController _authorPhoneController = TextEditingController();
-  TextEditingController _imageController = TextEditingController();
-  TextEditingController _priceController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _authorNameController = TextEditingController();
+  final TextEditingController _authorPhoneController = TextEditingController();
+  final TextEditingController _imageController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
   void _refreshData() async {
     final data = await SQLHelper.getAllData();
@@ -36,20 +37,11 @@ class _DataFormState extends State<DataForm> {
       setState(() {
         _imageController.text = pickedFile.path;
       });
+    } else {
+      setState(() {
+        _imageController.text = 'assets/images/no_photo.jpg';
+      });
     }
-  }
-
-  Future<void> _addData() async {
-    await SQLHelper.createData(
-      _titleController.text,
-      _descriptionController.text,
-      _selectedCategory!.name,
-      _authorNameController.text,
-      int.tryParse(_authorPhoneController.text)!,
-      _imageController.text,
-      double.tryParse(_priceController.text),
-    );
-    _refreshData();
   }
 
   void _fillFieldsWithAd() async {
@@ -60,15 +52,17 @@ class _DataFormState extends State<DataForm> {
       _selectedCategory = SQLHelper.categoriesList
           .firstWhere((category) => category.name == ad.first['category']);
       _authorNameController.text = ad.first['author_name'];
-      _authorPhoneController.text = ad.first['author_phone'];
-      _imageController.text = ad.first['image'];
+      _authorPhoneController.text = ad.first['author_phone'].toString();
+      _imageController.text = ad.first['image'].toString();
       _priceController.text = ad.first['price'].toString();
     });
+    _refreshData();
   }
 
   @override
   void initState() {
     super.initState();
+    _imageController.text = '';
     if (widget.adID != null) {
       _fillFieldsWithAd();
     }
@@ -81,7 +75,7 @@ class _DataFormState extends State<DataForm> {
           title: Text(
               widget.adID != null ? "Редактирование" : "Создание объявления")),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -151,12 +145,13 @@ class _DataFormState extends State<DataForm> {
                   labelText: 'Цена ₽',
                   prefixText: '\u{20BD} ',
                 ),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Добавить Изображение'),
+                child: const Text('Добавить Изображение'),
               ),
               ElevatedButton(
                 onPressed: () {

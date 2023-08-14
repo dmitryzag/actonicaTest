@@ -1,7 +1,6 @@
+import 'package:actonic_adboard/screens/advert_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:actonic_adboard/screens/advert_maker.dart';
-import 'package:actonic_adboard/screens/favorites.dart';
-import 'package:actonic_adboard/screens/adverts.dart';
 
 import 'models/database.dart';
 
@@ -20,10 +19,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int currentIndex = 0;
-  final List<Widget> screens = [
-    Adverts(),
-    const FavoriteAdverts(),
-    const DataForm(null)
+  final List<Widget> screens = const [
+    AdvertScreen(),
+    AdvertScreen(isFavorite: true),
+    DataForm(null)
   ];
 
   @override

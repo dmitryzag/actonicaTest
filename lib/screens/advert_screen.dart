@@ -1,31 +1,32 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:actonic_adboard/screens/advert_details.dart';
-import 'package:actonic_adboard/models/database.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:actonic_adboard/models/dummy_data.dart';
 
-class Adverts extends StatefulWidget {
-  const Adverts({Key? key}) : super(key: key);
+import '../models/database.dart';
+import 'advert_details.dart';
+
+class AdvertScreen extends StatefulWidget {
+  final bool isFavorite;
+  const AdvertScreen({this.isFavorite = false, super.key});
 
   @override
-  State<Adverts> createState() => _AdvertsState();
+  State<AdvertScreen> createState() => _AdvertScreenState();
 }
 
-class _AdvertsState extends State<Adverts> {
+class _AdvertScreenState extends State<AdvertScreen> {
   List<int> favoriteData = [];
+  List<Map<String, dynamic>> _favoriteAdverts = [];
   List<Map<String, dynamic>> _allData = [];
   bool _isLoading = true;
   SharedPreferences? _preferences;
-  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
-    _refreshData();
-    _initPreferences();
     super.initState();
+    _initPreferences();
+    _getRelativeData();
   }
 
   Future<void> _initPreferences() async {
@@ -58,9 +59,19 @@ class _AdvertsState extends State<Adverts> {
     _saveFavoriteData();
   }
 
-  Future<void> _refreshData() async {
+  Future<void> _getRelativeData() async {
     final data = await SQLHelper.getAllData();
+    final List<Map<String, dynamic>> favoriteAdverts = [];
+
+    for (final item in data) {
+      final adId = item['id'];
+      if (favoriteData.contains(adId)) {
+        favoriteAdverts.add(item);
+      }
+    }
+
     setState(() {
+      _favoriteAdverts = favoriteAdverts;
       _allData = data;
       _isLoading = false;
     });
@@ -68,42 +79,47 @@ class _AdvertsState extends State<Adverts> {
 
   @override
   Widget build(BuildContext context) {
+    _getRelativeData();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Доска объявлений'),
+        title: widget.isFavorite
+            ? const Text('Избранные объявления')
+            : const Text('Доска объявлений'),
       ),
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _refreshData,
-        child: ListView.separated(
-          itemCount: _allData.length,
-          separatorBuilder: (context, index) => Divider(),
-          itemBuilder: (BuildContext context, int index) {
-            final item = _allData[index];
-            final adId = item['id'];
-            final isFavorite = favoriteData.contains(adId);
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.separated(
+              itemCount:
+                  widget.isFavorite ? _favoriteAdverts.length : _allData.length,
+              separatorBuilder: (context, index) => const Divider(),
+              itemBuilder: (BuildContext context, int index) {
+                final item = widget.isFavorite
+                    ? _favoriteAdverts[index]
+                    : _allData[index];
+                final adId = item['id'];
+                final isFavorite = favoriteData.contains(adId);
 
-            return GestureDetector(
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdDetailsScreen(
-                      favoriteData: favoriteData,
-                      isFavorite: isFavorite,
-                      adId: adId,
-                      onToggleFavorite: (isFavorite) {
-                        _toggleFavorite(adId, isFavorite);
-                      },
-                    ),
-                  ),
+                return GestureDetector(
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AdvertDetails(
+                          favoriteData: favoriteData,
+                          isFavorite: isFavorite,
+                          adId: adId,
+                          onToggleFavorite: (isFavorite) {
+                            _toggleFavorite(adId, isFavorite);
+                          },
+                        ),
+                      ),
+                    );
+                    _getRelativeData();
+                  },
+                  child: buildAdvertContainer(context, item, isFavorite),
                 );
               },
-              child: buildAdvertContainer(context, item, isFavorite),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 
@@ -131,7 +147,7 @@ class _AdvertsState extends State<Adverts> {
   Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
     final dateTime = DateTime.parse(item['createdAt']);
     final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-
+    var price = item['price'] == Null ? 'бесплатно' : '${item['price']} руб.';
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,12 +161,12 @@ class _AdvertsState extends State<Adverts> {
         const SizedBox(height: 8),
         Text(
           "${item['author_name']} · $formattedDate",
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 8),
         Text(
-          '${item['price'] is Null ? 'бесплатно' : item['price'].toString() + ' руб.'}',
-          style: Theme.of(context).textTheme.bodyLarge,
+          price,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 8),
         buildFavoriteIcons(item['id']),
@@ -208,7 +224,7 @@ class _AdvertsState extends State<Adverts> {
         borderRadius: BorderRadius.circular(8.0),
         image: DecorationImage(
           fit: BoxFit.cover,
-          image: FileImage(File(imageUrl)),
+          image: Image.asset("assets/images/no_photo.jpg").image,
         ),
       ),
     );
