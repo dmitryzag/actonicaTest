@@ -3,7 +3,11 @@ import 'package:actonic_adboard/screens/advert_maker.dart';
 import 'package:actonic_adboard/screens/favorites.dart';
 import 'package:actonic_adboard/screens/adverts.dart';
 
+import 'models/database.dart';
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SQLHelper.db();
   runApp(const MyApp());
 }
 
