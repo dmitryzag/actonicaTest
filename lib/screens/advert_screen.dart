@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:actonic_adboard/bloc/advert_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
   List<Map<String, dynamic>> _allData = [];
   bool _isLoading = true;
   SharedPreferences? _preferences;
+  final bloc = AdvertBloc();
 
   @override
   void initState() {
@@ -79,6 +81,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bloc.add(AdvertAllData());
     _getRelativeData();
     return Scaffold(
       appBar: AppBar(
