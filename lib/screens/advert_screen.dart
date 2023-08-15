@@ -36,7 +36,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
 
   void _loadFavoriteData() {
     final favoriteDataString = _preferences!.getString('favoriteData');
-    if (favoriteDataString != null) {
+    if (favoriteDataString != null && favoriteDataString.isNotEmpty) {
       setState(() {
         favoriteData = favoriteDataString.split(',').map(int.parse).toList();
       });
