@@ -70,11 +70,13 @@ class _AdvertScreenState extends State<AdvertScreen> {
       }
     }
 
-    setState(() {
-      _favoriteAdverts = favoriteAdverts;
-      _allData = data;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _favoriteAdverts = favoriteAdverts;
+        _allData = data;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
