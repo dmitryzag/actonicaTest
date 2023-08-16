@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:actonic_adboard/models/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -55,7 +57,9 @@ class _AdvertMakerState extends State<AdvertMaker> {
       _authorNameController.text = ad.first['author_name'];
       _authorPhoneController.text = ad.first['author_phone'].toString();
       _imageController.text = ad.first['image'].toString();
-      _priceController.text = ad.first['price'].toString();
+      _priceController.text = ad.first['price'].toString() == 'null'
+          ? ''
+          : ad.first['price'].toString();
     });
     _refreshData();
   }
@@ -137,7 +141,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
                   validator: (value) {
                     if (int.tryParse(value!) is! int) {
                       return 'Пожалуйста введите номер телефона автора';
-                    } else if (value.length != 9) {
+                    } else if (value.length != 10) {
                       return 'Пожалуйста введите корректный телефона автора';
                     }
                     return null;
@@ -151,7 +155,19 @@ class _AdvertMakerState extends State<AdvertMaker> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}$')),
+                  ],
                 ),
+                const SizedBox(height: 25.0),
+                _imageController.text.isNotEmpty
+                    ? Image.file(
+                        File(_imageController.text),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                      )
+                    : Image.asset('assets/images/nophoto.jpg'),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: _pickImage,
