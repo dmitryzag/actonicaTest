@@ -4,9 +4,8 @@ import 'package:actonic_adboard/screens/advert_maker.dart';
 import 'package:provider/provider.dart';
 
 import 'models/database.dart';
-import 'bloc/advert_bloc.dart'; // импортируем файл с блоком
-import 'bloc/advert_event.dart'; // импортируем файл с событиями
-import 'package:flutter_bloc/flutter_bloc.dart'; // импортируем пакет flutter_bloc
+import 'bloc/advert_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
