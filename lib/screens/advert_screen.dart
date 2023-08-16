@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
-import '../models/database.dart';
+import '../bloc/advert_bloc.dart';
+import '../bloc/advert_event.dart';
+import '../bloc/advert_state.dart';
 import 'advert_details.dart';
 
 class AdvertScreen extends StatefulWidget {
@@ -16,221 +19,179 @@ class AdvertScreen extends StatefulWidget {
 }
 
 class _AdvertScreenState extends State<AdvertScreen> {
-  List<int> favoriteData = [];
-  List<Map<String, dynamic>> _favoriteAdverts = [];
-  List<Map<String, dynamic>> _allData = [];
-  bool _isLoading = true;
-  SharedPreferences? _preferences;
-
   @override
   void initState() {
     super.initState();
-    _initPreferences();
-    _getRelativeData();
-  }
-
-  Future<void> _initPreferences() async {
-    _preferences = await SharedPreferences.getInstance();
-    _loadFavoriteData();
-  }
-
-  void _loadFavoriteData() {
-    final favoriteDataString = _preferences!.getString('favoriteData');
-    if (favoriteDataString != null && favoriteDataString.isNotEmpty) {
-      setState(() {
-        favoriteData = favoriteDataString.split(',').map(int.parse).toList();
-      });
-    }
-  }
-
-  Future<void> _saveFavoriteData() async {
-    final favoriteDataString = favoriteData.join(',');
-    await _preferences!.setString('favoriteData', favoriteDataString);
-  }
-
-  void _toggleFavorite(int adId, bool isFavorite) {
-    setState(() {
-      if (isFavorite) {
-        favoriteData.add(adId);
-      } else {
-        favoriteData.remove(adId);
-      }
-    });
-    _saveFavoriteData();
-  }
-
-  Future<void> _getRelativeData() async {
-    final data = await SQLHelper.getAllData();
-    final List<Map<String, dynamic>> favoriteAdverts = [];
-
-    for (final item in data) {
-      final adId = item['id'];
-      if (favoriteData.contains(adId)) {
-        favoriteAdverts.add(item);
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        _favoriteAdverts = favoriteAdverts;
-        _allData = data;
-        _isLoading = false;
-      });
-    }
+    context.read<AdvertBloc>().add(LoadData());
+    context.read<AdvertBloc>().add(InitPreferences());
   }
 
   @override
   Widget build(BuildContext context) {
-    _getRelativeData();
+    final advertBloc = Provider.of<AdvertBloc>(context);
+    advertBloc.add(LoadData());
     return Scaffold(
       appBar: AppBar(
         title: widget.isFavorite
-            ? const Text('Избранные объявления')
-            : const Text('Доска объявлений'),
+            ? Text('Избранные объявления')
+            : Text('Все объявления'),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              itemCount:
-                  widget.isFavorite ? _favoriteAdverts.length : _allData.length,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (BuildContext context, int index) {
-                final item = widget.isFavorite
-                    ? _favoriteAdverts[index]
-                    : _allData[index];
-                final adId = item['id'];
-                final isFavorite = favoriteData.contains(adId);
+      body: BlocBuilder<AdvertBloc, AdvertState>(builder: (context, state) {
+        if (state is Loading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is Loaded) {
+          List<Map<String, dynamic>> filteredData = [];
+          if (widget.isFavorite) {
+            filteredData = state.allData
+                .where((item) => state.favoriteData.contains(item['id']))
+                .toList();
+          } else {
+            filteredData = state.allData;
+          }
 
-                return GestureDetector(
-                  onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdvertDetails(
-                          favoriteData: favoriteData,
-                          isFavorite: isFavorite,
-                          adId: adId,
-                          onToggleFavorite: (isFavorite) {
-                            _toggleFavorite(adId, isFavorite);
-                          },
-                        ),
-                      ),
-                    );
-                    _getRelativeData();
+          Widget buildAdvertImage(String? imageUrl) {
+            if (imageUrl == null) {
+              return Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              );
+            }
+            return Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(8.0),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: imageUrl == ''
+                      ? Image.asset('assets/images/nophoto.jpg').image
+                      : FileImage(File(imageUrl)),
+                ),
+              ),
+            );
+          }
+
+          Widget buildFavoriteIcons(int adId) {
+            final isFavorite = state.favoriteData.contains(adId);
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () {
+                    context
+                        .read<AdvertBloc>()
+                        .add(ToggleFavorite(adId, !isFavorite));
                   },
-                  child: buildAdvertContainer(context, item, isFavorite),
-                );
-              },
-            ),
-    );
-  }
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Icon(
+                      isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border_outlined,
+                      size: 25,
+                      color: isFavorite ? Colors.red : null,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
 
-  Widget buildAdvertContainer(
-      BuildContext context, Map<String, dynamic> item, bool isFavorite) {
-    return Container(
-      height: 136,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE0E0E0)),
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          Expanded(
-            child: buildAdvertInfo(item, context),
-          ),
-          buildAdvertImage(item['image']),
-        ],
-      ),
-    );
-  }
+          Widget buildAdvertInfo(
+              Map<String, dynamic> item, BuildContext context) {
+            final dateTime = DateTime.parse(item['createdAt']);
+            final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
+            var price =
+                item['price'] == null ? 'бесплатно' : '${item['price']} руб.';
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['title'],
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "${item['author_name']} · $formattedDate",
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  price,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 8),
+                buildFavoriteIcons(item['id']),
+              ],
+            );
+          }
 
-  Widget buildAdvertInfo(Map<String, dynamic> item, BuildContext context) {
-    final dateTime = DateTime.parse(item['createdAt']);
-    final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-    var price = item['price'] == null ? 'бесплатно' : '${item['price']} руб.';
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          item['title'],
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "${item['author_name']} · $formattedDate",
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          price,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 8),
-        buildFavoriteIcons(item['id']),
-      ],
-    );
-  }
+          Widget buildAdvertContainer(BuildContext context,
+              Map<String, dynamic> item, bool isFavorite) {
+            return Container(
+              height: 136,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: const Color(0xFFE0E0E0)),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: buildAdvertInfo(item, context),
+                  ),
+                  buildAdvertImage(item['image']),
+                ],
+              ),
+            );
+          }
 
-  Widget buildFavoriteIcons(int adId) {
-    final isFavorite = favoriteData.contains(adId);
+          return ListView.separated(
+            itemCount: filteredData.length,
+            separatorBuilder: (context, index) => const Divider(),
+            itemBuilder: (BuildContext context, int index) {
+              final item = filteredData[index];
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          onTap: () {
-            setState(() {
-              if (isFavorite) {
-                favoriteData.remove(adId);
-              } else {
-                favoriteData.add(adId);
-              }
-            });
-            _saveFavoriteData();
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Icon(
-              isFavorite ? Icons.favorite : Icons.favorite_border_outlined,
-              size: 25,
-              color: isFavorite ? Colors.red : null,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+              final adId = item['id'];
+              final isFavorite = state.favoriteData.contains(adId);
 
-  Widget buildAdvertImage(String? imageUrl) {
-    if (imageUrl == null) {
-      return Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-          color: Colors.grey,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      );
-    }
-
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.grey,
-        borderRadius: BorderRadius.circular(8.0),
-        image: DecorationImage(
-          fit: BoxFit.cover,
-          image: imageUrl == ''
-              ? Image.asset('assets/images/nophoto.jpg').image
-              : FileImage(File(imageUrl)),
-        ),
-      ),
+              return GestureDetector(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdvertDetails(
+                        isFavorite: isFavorite,
+                        adId: adId,
+                        onToggleFavorite: (isFavorite) {
+                          context
+                              .read<AdvertBloc>()
+                              .add(ToggleFavorite(adId, isFavorite));
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: buildAdvertContainer(context, item, isFavorite),
+              );
+            },
+          );
+        } else if (state is Error) {
+          return Center(child: Text(state.message));
+        } else {
+          return Container();
+        }
+      }),
     );
   }
 }

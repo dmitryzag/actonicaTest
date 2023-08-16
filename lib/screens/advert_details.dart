@@ -10,12 +10,10 @@ import 'advert_maker.dart';
 class AdvertDetails extends StatefulWidget {
   final int adId;
   final bool isFavorite;
-  final List<int> favoriteData;
   final Function(bool isFavorite) onToggleFavorite;
 
   const AdvertDetails({
     super.key,
-    required this.favoriteData,
     required this.isFavorite,
     required this.adId,
     required this.onToggleFavorite,
