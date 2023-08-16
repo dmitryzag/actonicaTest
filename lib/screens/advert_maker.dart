@@ -1,5 +1,6 @@
 import 'package:actonic_adboard/models/database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AdvertMaker extends StatefulWidget {
@@ -126,6 +127,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
                   },
                 ),
                 TextFormField(
+                  inputFormatters: [LengthLimitingTextInputFormatter(10)],
                   controller: _authorPhoneController,
                   decoration: const InputDecoration(
                     labelText: 'Телефон автора',
@@ -135,6 +137,8 @@ class _AdvertMakerState extends State<AdvertMaker> {
                   validator: (value) {
                     if (int.tryParse(value!) is! int) {
                       return 'Пожалуйста введите номер телефона автора';
+                    } else if (value.length != 9) {
+                      return 'Пожалуйста введите корректный телефона автора';
                     }
                     return null;
                   },
