@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:actonic_adboard/bloc/advert_event.dart';
 import 'package:actonic_adboard/bloc/advert_state.dart';
 
-import 'package:actonic_adboard/models/database.dart';
+import 'package:actonic_adboard/models/advert.dart';
 
 class AdvertBloc extends Bloc<AdvertEvent, AdvertState> {
   AdvertBloc() : super(Loading()) {
@@ -14,23 +14,18 @@ class AdvertBloc extends Bloc<AdvertEvent, AdvertState> {
     on<InitPreferences>(initPreferences);
   }
   SharedPreferences? _preferences;
-  List<int> _favoriteData = [];
-  List<Map<String, dynamic>> _favoriteAdverts = [];
-  List<Map<String, dynamic>> _allData = [];
+  List<int> _favoriteIds = [];
+  List<Advert> _favoriteAdverts = [];
+  List<Advert> _allAdverts = [];
 
   void loadData(LoadData event, Emitter<AdvertState> emit) async {
     try {
-      final data = await SQLHelper.getAllData();
-      final List<Map<String, dynamic>> favoriteAdverts = [];
-      for (final item in data) {
-        final adId = item['id'];
-        if (_favoriteData.contains(adId)) {
-          favoriteAdverts.add(item);
-        }
-      }
+      final data = await Advert.getAll();
+      final List<Advert> favoriteAdverts =
+          data.where((item) => _favoriteIds.contains(item.id)).toList();
       _favoriteAdverts = favoriteAdverts;
-      _allData = data;
-      emit(Loaded(_allData, _favoriteAdverts, _favoriteData));
+      _allAdverts = data;
+      emit(Loaded(_allAdverts, _favoriteAdverts, _favoriteIds));
     } catch (e) {
       emit(Error(e.toString()));
     }
@@ -40,30 +35,34 @@ class AdvertBloc extends Bloc<AdvertEvent, AdvertState> {
     final adId = event.adId;
     final isFavorite = event.isFavorite;
     if (isFavorite) {
-      _favoriteData.add(adId);
+      _favoriteIds.add(adId);
+      final advert = _allAdverts.firstWhere((item) => item.id == adId);
+      _favoriteAdverts.add(advert);
     } else {
-      _favoriteData.remove(adId);
+      _favoriteIds.remove(adId);
+      final advert = _favoriteAdverts.firstWhere((item) => item.id == adId);
+      _favoriteAdverts.remove(advert);
     }
     emit(FavoriteChanged(adId, isFavorite));
-    emit(Loaded(_allData, _favoriteAdverts, _favoriteData));
-    saveFavoriteData(SaveFavoriteData(_favoriteData), emit);
+    emit(Loaded(_allAdverts, _favoriteAdverts, _favoriteIds));
+    saveFavoriteData(SaveFavoriteData(_favoriteIds), emit);
   }
 
   void saveFavoriteData(
       SaveFavoriteData event, Emitter<AdvertState> emit) async {
-    final favoriteDataString = event.favoriteData.join(',');
-    await _preferences!.setString('favoriteData', favoriteDataString);
+    final favoriteIdsString = event.favoriteData.join(',');
+    await _preferences!.setString('favoriteIds', favoriteIdsString);
   }
 
   void initPreferences(InitPreferences event, Emitter<AdvertState> emit) async {
     _preferences = await SharedPreferences.getInstance();
-    _loadFavoriteData();
+    _loadFavoriteIds();
   }
 
-  void _loadFavoriteData() {
-    final favoriteDataString = _preferences!.getString('favoriteData');
-    if (favoriteDataString != null && favoriteDataString.isNotEmpty) {
-      _favoriteData = favoriteDataString.split(',').map(int.parse).toList();
+  void _loadFavoriteIds() {
+    final favoriteIdsString = _preferences!.getString('favoriteIds');
+    if (favoriteIdsString != null && favoriteIdsString.isNotEmpty) {
+      _favoriteIds = favoriteIdsString.split(',').map(int.parse).toList();
     }
   }
 }

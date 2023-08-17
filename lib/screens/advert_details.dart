@@ -1,4 +1,4 @@
-import 'package:actonic_adboard/models/database.dart';
+import 'package:actonic_adboard/models/advert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,7 +25,7 @@ class AdvertDetails extends StatefulWidget {
 }
 
 class _AdvertDetailsState extends State<AdvertDetails> {
-  late List<Map<String, dynamic>> _adData;
+  late List<Advert> _adData;
   bool _isLoading = true;
   bool _isFavorite = false;
 
@@ -46,7 +46,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
   }
 
   void _loadAdData() async {
-    _adData = await SQLHelper.getSingleData(widget.adId);
+    _adData = await Advert.getAll();
 
     setState(() {
       _isLoading = false;
@@ -70,15 +70,15 @@ class _AdvertDetailsState extends State<AdvertDetails> {
   }
 
   Image imageControl() {
-    if (_adData.first['image'] != null && _adData.first['image'] != '') {
-      return Image.file(File(_adData.first['image']));
+    if (_adData.first.image != null && _adData.first.image != '') {
+      return Image.file(File(_adData.first.image!));
     } else {
       return Image.asset('assets/images/nophoto.jpg');
     }
   }
 
   void _deleteAd() async {
-    await SQLHelper.deleteData(widget.adId);
+    await Advert.delete(widget.adId);
     Navigator.pop(context, true);
     Navigator.pushReplacement(
       context,
@@ -93,12 +93,12 @@ class _AdvertDetailsState extends State<AdvertDetails> {
         title: const Text('Детали объявления'),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             onPressed: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => AdvertMaker(_adData.first['id'])),
+                    builder: (context) => AdvertMaker(_adData.first.id)),
               );
 
               if (result == true) {
@@ -113,7 +113,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
             onPressed: _toggleFavorite,
           ),
           IconButton(
-            icon: Icon(Icons.delete),
+            icon: const Icon(Icons.delete),
             onPressed: _deleteAd,
           ),
         ],
@@ -129,7 +129,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _adData.first['title'],
+                        _adData.first.title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -137,7 +137,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                        'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_adData.first["createdAt"]))}',
+                        'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_adData.first.createdAt.toIso8601String()))}',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -154,7 +154,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(_adData.first['description']),
+                      Text(_adData.first.description!),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Категория:',
@@ -164,7 +164,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(_adData.first['category']),
+                      Text(_adData.first.category),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Автор:',
@@ -174,7 +174,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text('Имя: ${_adData.first['author_name']}'),
+                      Text('Имя: ${_adData.first.authorName}'),
                       const SizedBox(height: 8.0),
                       const SizedBox(height: 16.0),
                       const Text(
@@ -185,9 +185,9 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(_adData.first['price'] == null
+                      Text(_adData.first.price == null
                           ? 'бесплатно'
-                          : '${_adData.first['price']} руб.'),
+                          : '${_adData.first.price} руб.'),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Позвонить по телефону:',
@@ -201,7 +201,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         alignment: Alignment.bottomLeft,
                         child: GestureDetector(
                           onTap: () => _makingPhoneCall(
-                              "+7${_adData.first['author_phone']}"),
+                              "+7${_adData.first.authorPhone}"),
                           child: Row(
                             children: [
                               const Icon(
@@ -211,7 +211,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                               const Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 5)),
                               Text(
-                                "+7${_adData.first['author_phone']}",
+                                "+7${_adData.first.authorPhone}",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,

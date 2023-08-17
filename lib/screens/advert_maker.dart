@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../models/advert.dart';
+
 class AdvertMaker extends StatefulWidget {
   final int? adID;
   const AdvertMaker(this.adID, {Key? key}) : super(key: key);
@@ -14,7 +16,7 @@ class AdvertMaker extends StatefulWidget {
 
 class _AdvertMakerState extends State<AdvertMaker> {
   // ignore: unused_field
-  List<Map<String, dynamic>> _allData = [];
+  List<Advert> _allData = [];
   Category? _selectedCategory;
 
   final _formKey = GlobalKey<FormState>();
@@ -26,7 +28,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
   final TextEditingController _priceController = TextEditingController();
 
   void _refreshData() async {
-    final data = await SQLHelper.getAllData();
+    final data = await Advert.getAll();
     setState(() {
       _allData = data;
     });
@@ -48,18 +50,19 @@ class _AdvertMakerState extends State<AdvertMaker> {
   }
 
   void _fillFieldsWithAd() async {
-    final ad = await SQLHelper.getSingleData(widget.adID!);
+    final ad = await Advert.getSingle(widget.adID!);
     setState(() {
-      _titleController.text = ad.first['title'];
-      _descriptionController.text = ad.first['description'];
-      _selectedCategory = SQLHelper.categoriesList
-          .firstWhere((category) => category.name == ad.first['category']);
-      _authorNameController.text = ad.first['author_name'];
-      _authorPhoneController.text = ad.first['author_phone'].toString();
-      _imageController.text = ad.first['image'].toString();
-      _priceController.text = ad.first['price'].toString() == 'null'
-          ? ''
-          : ad.first['price'].toString();
+      if (ad != null) {
+        _titleController.text = ad.title;
+        _descriptionController.text = ad.description!;
+        _selectedCategory = Advert.categoriesList
+            .firstWhere((category) => category.name == ad.category);
+        _authorNameController.text = ad.authorName;
+        _authorPhoneController.text = ad.authorPhone.toString();
+        _imageController.text = ad.image.toString();
+        _priceController.text =
+            ad.price.toString() == 'null' ? '' : ad.price.toString();
+      }
     });
     _refreshData();
   }
@@ -106,7 +109,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
                       _selectedCategory = newValue;
                     });
                   },
-                  items: SQLHelper.categoriesList.map((Category category) {
+                  items: Advert.categoriesList.map((Category category) {
                     return DropdownMenuItem<Category>(
                       value: category,
                       child: Text(category.name),
@@ -188,7 +191,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
                           : double.parse(_priceController.text);
 
                       if (widget.adID != null) {
-                        SQLHelper.updateData(
+                        Advert.update(
                           widget.adID!,
                           title,
                           description,
@@ -200,7 +203,7 @@ class _AdvertMakerState extends State<AdvertMaker> {
                         );
                         Navigator.pop(context, true);
                       } else {
-                        SQLHelper.createData(
+                        Advert.create(
                           title,
                           description,
                           category,

@@ -2,7 +2,7 @@ import 'package:actonic_adboard/models/database.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class Advert {
-  final int id;
+  final int? id;
   final String title;
   final String? description;
   final String category;
@@ -30,7 +30,7 @@ class Advert {
         category = map['category'],
         authorName = map['author_name'],
         authorPhone = map['author_phone'],
-        createdAt = DateTime.parse(map['createdAt']),
+        createdAt = DateTime.parse(map['createdAt'].toString()),
         image = map['image'],
         price = map['price'];
 
@@ -53,7 +53,7 @@ class Advert {
     final db = await SQLHelper.db();
 
     final advert = Advert(
-        id: 0,
+        id: null,
         title: title,
         description: desc,
         category: category,
@@ -115,6 +115,12 @@ class Advert {
         .update('data', advert.toMap(), where: 'id = ?', whereArgs: [id]);
     return result;
   }
+
+  static List<Category> categoriesList = [
+    Category(1, 'Животные'),
+    Category(2, 'Бытовая техника'),
+    Category(3, 'Недвижимость'),
+  ];
 
   static Future<void> delete(int id) async {
     final db = await SQLHelper.db();

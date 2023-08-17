@@ -1,50 +1,50 @@
-import 'database.dart';
+import 'advert.dart';
 
 createDummyData() {
-  SQLHelper.createData(
+  Advert.create(
     'Продам собаку',
     'Человек собаке друг',
-    SQLHelper.categoriesList[0].name,
+    Advert.categoriesList[0].name,
     'Дмитрий',
     9059110772,
     '',
     100,
   );
 
-  SQLHelper.createData(
+  Advert.create(
     'Продам чипсы',
     'БУ, чуть-чуть поел чипсинки',
-    SQLHelper.categoriesList[1].name,
+    Advert.categoriesList[1].name,
     'Андрей',
     9059110772,
     '',
     200,
   );
 
-  SQLHelper.createData(
+  Advert.create(
     'Продам почку',
     'Да зачем мне она, все равно их две',
-    SQLHelper.categoriesList[2].name,
+    Advert.categoriesList[2].name,
     'Алексей',
     9059110772,
     '',
     300,
   );
 
-  SQLHelper.createData(
+  Advert.create(
     'Продам гитару',
     'Хорошая гитара, наверное, никогда не играл',
-    SQLHelper.categoriesList[0].name,
+    Advert.categoriesList[0].name,
     'Ольга',
     9059110772,
     '',
     400,
   );
 
-  SQLHelper.createData(
+  Advert.create(
     'Продам линейку',
     'Хорошая линейка, 30см, пользовался для чертежей',
-    SQLHelper.categoriesList[1].name,
+    Advert.categoriesList[1].name,
     'Оппенгеймер',
     9059110772,
     '',

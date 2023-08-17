@@ -1,3 +1,5 @@
+import '../models/advert.dart';
+
 abstract class AdvertState {
   const AdvertState();
 }
@@ -5,11 +7,11 @@ abstract class AdvertState {
 class Loading extends AdvertState {}
 
 class Loaded extends AdvertState {
-  final List<Map<String, dynamic>> allData;
-  final List<Map<String, dynamic>> favoriteAdverts;
-  final List<int> favoriteData;
+  final List<Advert> allAdverts;
+  final List<Advert> favoriteAdverts;
+  final List<int> favoriteIds;
 
-  const Loaded(this.allData, this.favoriteAdverts, this.favoriteData);
+  const Loaded(this.allAdverts, this.favoriteAdverts, this.favoriteIds);
 }
 
 class Error extends AdvertState {

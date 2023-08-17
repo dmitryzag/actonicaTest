@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../bloc/advert_bloc.dart';
 import '../bloc/advert_event.dart';
 import '../bloc/advert_state.dart';
+import '../models/advert.dart';
 import 'advert_details.dart';
 
 class AdvertScreen extends StatefulWidget {
@@ -40,13 +41,15 @@ class _AdvertScreenState extends State<AdvertScreen> {
         if (state is Loading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is Loaded) {
-          List<Map<String, dynamic>> filteredData = [];
+          List<Advert> filteredData = [];
           if (widget.isFavorite) {
-            filteredData = state.allData
-                .where((item) => state.favoriteData.contains(item['id']))
+            filteredData = state.allAdverts
+                .where((item) => state.favoriteAdverts
+                    .map((fav) => fav.id)
+                    .contains(item.id))
                 .toList();
           } else {
-            filteredData = state.allData;
+            filteredData = state.allAdverts;
           }
 
           Widget buildAdvertImage(String? imageUrl) {
@@ -77,7 +80,8 @@ class _AdvertScreenState extends State<AdvertScreen> {
           }
 
           Widget buildFavoriteIcons(int adId) {
-            final isFavorite = state.favoriteData.contains(adId);
+            final isFavorite =
+                state.favoriteAdverts.map((item) => item.id).contains(adId);
 
             return Row(
               mainAxisSize: MainAxisSize.min,
@@ -103,25 +107,23 @@ class _AdvertScreenState extends State<AdvertScreen> {
             );
           }
 
-          Widget buildAdvertInfo(
-              Map<String, dynamic> item, BuildContext context) {
-            final dateTime = DateTime.parse(item['createdAt']);
+          Widget buildAdvertInfo(Advert item, BuildContext context) {
+            final dateTime = DateTime.parse(item.createdAt.toString());
             final formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
-            var price =
-                item['price'] == null ? 'бесплатно' : '${item['price']} руб.';
+            var price = item.price == null ? 'бесплатно' : '${item.price} руб.';
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item['title'],
+                  item.title,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "${item['author_name']} · $formattedDate",
+                  "${item.authorName} · $formattedDate",
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 8),
@@ -130,13 +132,13 @@ class _AdvertScreenState extends State<AdvertScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 8),
-                buildFavoriteIcons(item['id']),
+                buildFavoriteIcons(item.id!),
               ],
             );
           }
 
-          Widget buildAdvertContainer(BuildContext context,
-              Map<String, dynamic> item, bool isFavorite) {
+          Widget buildAdvertContainer(
+              BuildContext context, Advert item, bool isFavorite) {
             return Container(
               height: 136,
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
@@ -150,7 +152,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
                   Expanded(
                     child: buildAdvertInfo(item, context),
                   ),
-                  buildAdvertImage(item['image']),
+                  buildAdvertImage(item.image),
                 ],
               ),
             );
@@ -162,8 +164,9 @@ class _AdvertScreenState extends State<AdvertScreen> {
             itemBuilder: (BuildContext context, int index) {
               final item = filteredData[index];
 
-              final adId = item['id'];
-              final isFavorite = state.favoriteData.contains(adId);
+              final adId = item.id;
+              final isFavorite =
+                  state.favoriteAdverts.map((item) => item.id).contains(adId);
 
               return GestureDetector(
                 onTap: () async {
@@ -172,7 +175,7 @@ class _AdvertScreenState extends State<AdvertScreen> {
                     MaterialPageRoute(
                       builder: (context) => AdvertDetails(
                         isFavorite: isFavorite,
-                        adId: adId,
+                        adId: adId!,
                         onToggleFavorite: (isFavorite) {
                           context
                               .read<AdvertBloc>()
