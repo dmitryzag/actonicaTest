@@ -25,7 +25,7 @@ class AdvertDetails extends StatefulWidget {
 }
 
 class _AdvertDetailsState extends State<AdvertDetails> {
-  late List<Advert> _adData;
+  late Advert item;
   bool _isLoading = true;
   bool _isFavorite = false;
 
@@ -46,7 +46,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
   }
 
   void _loadAdData() async {
-    _adData = await Advert.getAll();
+    item = (await Advert.getSingle(widget.adId))!;
 
     setState(() {
       _isLoading = false;
@@ -70,8 +70,8 @@ class _AdvertDetailsState extends State<AdvertDetails> {
   }
 
   Image imageControl() {
-    if (_adData.first.image != null && _adData.first.image != '') {
-      return Image.file(File(_adData.first.image!));
+    if (item.image != null && item.image != '') {
+      return Image.file(File(item.image!));
     } else {
       return Image.asset('assets/images/nophoto.jpg');
     }
@@ -97,8 +97,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
             onPressed: () async {
               final result = await Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => AdvertMaker(_adData.first.id)),
+                MaterialPageRoute(builder: (context) => AdvertMaker(item.id)),
               );
 
               if (result == true) {
@@ -129,7 +128,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _adData.first.title,
+                        item.title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -137,7 +136,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                        'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(_adData.first.createdAt.toIso8601String()))}',
+                        'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(item.createdAt.toIso8601String()))}',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -154,7 +153,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(_adData.first.description!),
+                      Text(item.description!),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Категория:',
@@ -164,7 +163,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(_adData.first.category),
+                      Text(item.category),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Автор:',
@@ -174,7 +173,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text('Имя: ${_adData.first.authorName}'),
+                      Text('Имя: ${item.authorName}'),
                       const SizedBox(height: 8.0),
                       const SizedBox(height: 16.0),
                       const Text(
@@ -185,9 +184,9 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                         ),
                       ),
                       const SizedBox(height: 8.0),
-                      Text(_adData.first.price == null
+                      Text(item.price == null
                           ? 'бесплатно'
-                          : '${_adData.first.price} руб.'),
+                          : '${item.price} руб.'),
                       const SizedBox(height: 16.0),
                       const Text(
                         'Позвонить по телефону:',
@@ -200,8 +199,8 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                       Align(
                         alignment: Alignment.bottomLeft,
                         child: GestureDetector(
-                          onTap: () => _makingPhoneCall(
-                              "+7${_adData.first.authorPhone}"),
+                          onTap: () =>
+                              _makingPhoneCall("+7${item.authorPhone}"),
                           child: Row(
                             children: [
                               const Icon(
@@ -211,7 +210,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                               const Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 5)),
                               Text(
-                                "+7${_adData.first.authorPhone}",
+                                "+7${item.authorPhone}",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
