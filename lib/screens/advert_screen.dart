@@ -33,12 +33,12 @@ class _AdvertScreenState extends State<AdvertScreen> {
     return Scaffold(
       appBar: AppBar(
         title: widget.isFavorite
-            ? Text('Избранные объявления')
-            : Text('Все объявления'),
+            ? const Text('Избранные объявления')
+            : const Text('Все объявления'),
       ),
       body: BlocBuilder<AdvertBloc, AdvertState>(builder: (context, state) {
         if (state is Loading) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (state is Loaded) {
           List<Map<String, dynamic>> filteredData = [];
           if (widget.isFavorite) {

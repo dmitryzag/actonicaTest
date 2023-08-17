@@ -23,7 +23,6 @@ class Advert {
       this.image,
       this.price});
 
-  // Конструктор для создания объекта из Map
   Advert.fromMap(Map<String, dynamic> map)
       : id = map['id'],
         title = map['title'],
@@ -35,7 +34,6 @@ class Advert {
         image = map['image'],
         price = map['price'];
 
-  // Метод для преобразования объекта в Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -44,13 +42,12 @@ class Advert {
       'category': category,
       'author_name': authorName,
       'author_phone': authorPhone,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt.toString(),
       'image': image,
       'price': price
     };
   }
 
-  // Метод для создания объявления в базе данных
   static Future<int> create(String title, String? desc, String category,
       String authorName, int authorPhone, String? image, double? price) async {
     final db = await SQLHelper.db();
@@ -71,7 +68,6 @@ class Advert {
     return id;
   }
 
-  // Метод для получения всех объявлений из базы данных
   static Future<List<Advert>> getAll() async {
     final db = await SQLHelper.db();
 
@@ -83,7 +79,6 @@ class Advert {
     });
   }
 
-  // Метод для получения одного объявления по id из базы данных
   static Future<Advert?> getSingle(int id) async {
     final db = await SQLHelper.db();
     final List<Map<String, dynamic>> maps =
@@ -95,7 +90,6 @@ class Advert {
     }
   }
 
-  // Метод для обновления объявления в базе данных
   static Future<int> update(
     int id,
     String title,
@@ -122,7 +116,6 @@ class Advert {
     return result;
   }
 
-  // Метод для удаления объявления из базы данных
   static Future<void> delete(int id) async {
     final db = await SQLHelper.db();
     try {

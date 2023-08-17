@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:actonic_adboard/bloc/advert_event.dart';
