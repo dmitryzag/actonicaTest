@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AdvertBloc>.value(value: advertBloc),
+        BlocProvider<AdvertBloc>.value(value: advertBloc),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

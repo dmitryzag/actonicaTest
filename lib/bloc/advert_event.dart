@@ -1,3 +1,5 @@
+import '../models/advert.dart';
+
 abstract class AdvertEvent {
   const AdvertEvent();
 }
@@ -18,3 +20,16 @@ class SaveFavoriteData extends AdvertEvent {
 }
 
 class InitPreferences extends AdvertEvent {}
+
+class LoadSingleData extends AdvertEvent {
+  final int adId;
+
+  LoadSingleData(this.adId);
+}
+
+class ToggleCurrentAdvert extends AdvertEvent {
+  final Advert item;
+  final bool isFavorite;
+
+  ToggleCurrentAdvert(this.item, this.isFavorite);
+}

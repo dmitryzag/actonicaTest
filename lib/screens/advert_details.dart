@@ -1,9 +1,12 @@
 import 'package:actonic_adboard/models/advert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
+import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/advert_bloc.dart';
+import '../bloc/advert_event.dart';
+import '../bloc/advert_state.dart';
 import '../main.dart';
 import 'advert_maker.dart';
 
@@ -25,206 +28,174 @@ class AdvertDetails extends StatefulWidget {
 }
 
 class _AdvertDetailsState extends State<AdvertDetails> {
-  late Advert item;
-  bool _isLoading = true;
-  bool _isFavorite = false;
-
   @override
   void initState() {
     super.initState();
-    _loadAdData();
-    _isFavorite = widget.isFavorite;
-  }
-
-  _makingPhoneCall(String phone) async {
-    var url = Uri.parse("tel:${phone.toString()}");
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
-  void _loadAdData() async {
-    item = (await Advert.getSingle(widget.adId))!;
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _refreshAdData() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    _loadAdData();
-  }
-
-  void _toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-
-    widget.onToggleFavorite(_isFavorite);
-  }
-
-  Image imageControl() {
-    if (item.image != null && item.image != '') {
-      return Image.file(File(item.image!));
-    } else {
-      return Image.asset('assets/images/nophoto.jpg');
-    }
-  }
-
-  void _deleteAd() async {
-    await Advert.delete(widget.adId);
-    Navigator.pop(context, true);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MyApp()),
-    );
+    context.read<AdvertBloc>().add(LoadSingleData(widget.adId));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Детали объявления'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AdvertMaker(item.id)),
-              );
-
-              if (result == true) {
-                _refreshAdData();
-              }
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-            ),
-            onPressed: _toggleFavorite,
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: _deleteAd,
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _refreshAdData,
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(item.createdAt.toIso8601String()))}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      imageControl(),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        'Описание:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(item.description!),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        'Категория:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(item.category),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        'Автор:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text('Имя: ${item.authorName}'),
-                      const SizedBox(height: 8.0),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        'Цена:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8.0),
-                      Text(item.price == null
-                          ? 'бесплатно'
-                          : '${item.price} руб.'),
-                      const SizedBox(height: 16.0),
-                      const Text(
-                        'Позвонить по телефону:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: GestureDetector(
-                          onTap: () =>
-                              _makingPhoneCall("+7${item.authorPhone}"),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.phone,
-                                color: Color.fromARGB(255, 19, 102, 170),
-                              ),
-                              const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 5)),
-                              Text(
-                                "+7${item.authorPhone}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    color: Colors.blue),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+    return BlocBuilder<AdvertBloc, AdvertState>(
+      builder: (context, state) {
+        if (state is SingleLoaded) {
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyApp()),
+                  );
+                },
+              ),
+              title: const Text('Детали объявления'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AdvertMaker(state.item.id)),
+                    );
+                    if (result == true) {
+                      context
+                          .read<AdvertBloc>()
+                          .add(LoadSingleData(widget.adId));
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    state.isFavorite ? Icons.favorite : Icons.favorite_border,
                   ),
+                  onPressed: () {
+                    context.read<AdvertBloc>().add(
+                        ToggleCurrentAdvert(state.item, !state.isFavorite));
+                  },
+                ),
+                IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      Advert.delete(state.item.id!);
+                      Navigator.pop(context, true);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MyApp()),
+                      );
+                    }),
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      state.item.title,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      'Опубликовано: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(state.item.createdAt.toIso8601String()))}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    state.imageControl(),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Описание:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(state.item.description!),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Категория:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(state.item.category),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Автор:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text('Имя: ${state.item.authorName}'),
+                    const SizedBox(height: 8.0),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Цена:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(state.item.price == null
+                        ? 'бесплатно'
+                        : '${state.item.price} руб.'),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Позвонить по телефону:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: GestureDetector(
+                        onTap: () => state
+                            .makingPhoneCall("+7${state.item.authorPhone}"),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.phone,
+                              color: Color.fromARGB(255, 19, 102, 170),
+                            ),
+                            const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 5)),
+                            Text(
+                              "+7${state.item.authorPhone}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.blue),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-      ),
+            ),
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 }

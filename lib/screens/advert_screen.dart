@@ -29,8 +29,8 @@ class _AdvertScreenState extends State<AdvertScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final advertBloc = Provider.of<AdvertBloc>(context);
-    advertBloc.add(LoadData());
+    context.read<AdvertBloc>().add(LoadData());
+
     return Scaffold(
       appBar: AppBar(
         title: widget.isFavorite
