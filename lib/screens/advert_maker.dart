@@ -9,7 +9,7 @@ import '../models/advert.dart';
 
 class AdvertMaker extends StatefulWidget {
   final int? adID;
-  const AdvertMaker(this.adID, {Key? key}) : super(key: key);
+  const AdvertMaker({this.adID, Key? key}) : super(key: key);
   @override
   _AdvertMakerState createState() => _AdvertMakerState();
 }

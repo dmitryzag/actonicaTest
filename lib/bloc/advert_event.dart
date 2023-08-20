@@ -1,4 +1,5 @@
 import '../models/advert.dart';
+import '../models/database.dart';
 
 abstract class AdvertEvent {
   const AdvertEvent();
@@ -32,4 +33,11 @@ class ToggleCurrentAdvert extends AdvertEvent {
   final bool isFavorite;
 
   ToggleCurrentAdvert(this.item, this.isFavorite);
+}
+
+class MakeAdverts extends AdvertEvent {
+  List<Advert> allData;
+  Category? selectedCategory;
+  int adId;
+  MakeAdverts(this.allData, this.selectedCategory, this.adId);
 }

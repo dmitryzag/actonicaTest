@@ -1,7 +1,6 @@
 import 'package:actonic_adboard/models/advert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/advert_bloc.dart';
@@ -42,7 +41,7 @@ class _AdvertDetailsState extends State<AdvertDetails> {
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
@@ -58,7 +57,8 @@ class _AdvertDetailsState extends State<AdvertDetails> {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AdvertMaker(state.item.id)),
+                          builder: (context) =>
+                              AdvertMaker(adID: state.item.id)),
                     );
                     if (result == true) {
                       context

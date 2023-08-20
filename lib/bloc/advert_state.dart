@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/advert.dart';
@@ -53,6 +54,26 @@ class SingleLoaded extends AdvertState {
 }
 
 class SingleLoading extends AdvertState {}
+
+class AdvertMakerState extends AdvertState {
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionCont = TextEditingController();
+  final TextEditingController authorNameContr = TextEditingController();
+  final TextEditingController authorPhoneCont = TextEditingController();
+  final TextEditingController imageController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      imageController.text = pickedFile.path;
+    } else {
+      imageController.text = '';
+    }
+  }
+}
 
 class Error extends AdvertState {
   final String message;

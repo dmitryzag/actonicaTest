@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:actonic_adboard/screens/advert_maker.dart';
 import 'package:provider/provider.dart';
 
+import 'app_theme.dart';
 import 'models/database.dart';
 import 'bloc/advert_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,12 +21,13 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+int currentIndex = 0;
+
 class _MyAppState extends State<MyApp> {
-  int currentIndex = 0;
   final List<Widget> screens = const [
     AdvertScreen(),
     AdvertScreen(isFavorite: true),
-    AdvertMaker(null)
+    AdvertMaker(),
   ];
 
   late AdvertBloc advertBloc;
@@ -49,6 +51,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider<AdvertBloc>.value(value: advertBloc),
       ],
       child: MaterialApp(
+        theme: AppTheme().themeData,
         debugShowCheckedModeBanner: false,
         home: BlocProvider(
           create: (context) => advertBloc,

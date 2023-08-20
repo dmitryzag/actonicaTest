@@ -88,8 +88,6 @@ class AdvertBloc extends Bloc<AdvertEvent, AdvertState> {
 
   void _loadFavoriteIds() {
     final favoriteIdsString = _preferences!.getString(FAVORITE_IDS_KEY);
-    if (favoriteIdsString != null && favoriteIdsString.isNotEmpty) {
-      _favoriteIds = favoriteIdsString.split(',').map(int.parse).toList();
-    }
+    _favoriteIds = favoriteIdsString?.split(',').map(int.parse).toList() ?? [];
   }
 }
